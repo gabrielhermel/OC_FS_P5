@@ -8,6 +8,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { SessionService } from 'src/app/services/session.service';
 
 import { MeComponent } from './me.component';
+import { expect } from '@jest/globals';
 
 describe('MeComponent', () => {
   let component: MeComponent;

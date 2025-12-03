@@ -1,0 +1,37 @@
+# Global
+.DS_Store
+Thumbs.db
+
+# Node / Angular
+Testez-une-application-full-stack/front/node_modules/
+Testez-une-application-full-stack/front/dist/
+Testez-une-application-full-stack/front/.angular/
+Testez-une-application-full-stack/front/.nyc_output/
+Testez-une-application-full-stack/front/coverage/
+Testez-une-application-full-stack/front/*.log
+Testez-une-application-full-stack/front/npm-debug.log*
+Testez-une-application-full-stack/front/yarn-error.log*
+
+# nyc temp outputs
+.nyc_output/
+
+# Cypress
+Testez-une-application-full-stack/front/cypress/videos/
+Testez-une-application-full-stack/front/cypress/screenshots/
+
+# Java / Spring Boot
+Testez-une-application-full-stack/back/target/
+Testez-une-application-full-stack/back/.DS_Store
+
+# Environment
+.env
+*.env
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Misc
+logs/
+node_modules/

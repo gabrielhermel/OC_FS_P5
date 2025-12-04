@@ -12,6 +12,7 @@ import { SessionService } from 'src/app/services/session.service';
 
 import { LoginComponent } from './login.component';
 import { AuthService } from '../../services/auth.service';
+import { throwError } from 'rxjs';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -52,7 +53,7 @@ describe('LoginComponent', () => {
     expect(passwordControl?.hasError('required')).toBeTruthy();
   });
 
-  // Form becomes valid with a proper email and password
+  // Verify that form validation passes with valid credentials
   it('should validate the form when email and password are correct', () => {
     component.form.setValue({
       email: 'test@example.com',
@@ -62,13 +63,13 @@ describe('LoginComponent', () => {
     expect(component.form.valid).toBe(true);
   });
 
-  // Shows an error when login fails
+  // Verify that error flag is set when authentication fails
   it('should set onError to true when login fails', () => {
-    // Mock AuthService.login to return an observable error
     const authService = TestBed.inject(AuthService);
-    jest.spyOn(authService, 'login').mockReturnValue({
-      subscribe: ({ error }: any) => error('Invalid credentials')
-    } as any);
+
+    jest.spyOn(authService, 'login').mockReturnValue(
+      throwError(() => new Error('Invalid credentials'))
+    );
 
     component.form.setValue({
       email: 'test@example.com',
@@ -78,5 +79,25 @@ describe('LoginComponent', () => {
     component.submit();
 
     expect(component.onError).toBe(true);
+  });
+
+  // Verify that AuthService.login is called with the correct credentials
+  it('should call authService.login with form credentials when form is valid', () => {
+    const authService = TestBed.inject(AuthService);
+    const loginSpy = jest.spyOn(authService, 'login').mockReturnValue({
+      subscribe: () => {}
+    } as any);
+
+    component.form.setValue({
+      email: 'user@example.com',
+      password: '123456'
+    });
+
+    component.submit();
+
+    expect(loginSpy).toHaveBeenCalledWith({
+      email: 'user@example.com',
+      password: '123456'
+    });
   });
 });

@@ -11,6 +11,7 @@ import { expect } from '@jest/globals';
 import { SessionService } from 'src/app/services/session.service';
 
 import { LoginComponent } from './login.component';
+import { AuthService } from '../../services/auth.service';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -59,5 +60,23 @@ describe('LoginComponent', () => {
     });
 
     expect(component.form.valid).toBe(true);
+  });
+
+  // Shows an error when login fails
+  it('should set onError to true when login fails', () => {
+    // Mock AuthService.login to return an observable error
+    const authService = TestBed.inject(AuthService);
+    jest.spyOn(authService, 'login').mockReturnValue({
+      subscribe: ({ error }: any) => error('Invalid credentials')
+    } as any);
+
+    component.form.setValue({
+      email: 'test@example.com',
+      password: '123456'
+    });
+
+    component.submit();
+
+    expect(component.onError).toBe(true);
   });
 });

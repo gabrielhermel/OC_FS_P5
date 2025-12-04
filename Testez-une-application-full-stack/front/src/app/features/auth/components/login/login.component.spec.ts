@@ -12,7 +12,8 @@ import { SessionService } from 'src/app/services/session.service';
 
 import { LoginComponent } from './login.component';
 import { AuthService } from '../../services/auth.service';
-import { throwError } from 'rxjs';
+import { of, throwError } from 'rxjs';
+import { Router } from '@angular/router';
 
 describe('LoginComponent', () => {
   let component: LoginComponent;
@@ -42,7 +43,7 @@ describe('LoginComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  // Verify email and password are required fields
+  // Verify that both email and password fields are required
   it('should invalidate the form when email and password are empty', () => {
     const form = component.form;
     const emailControl = form.get('email');
@@ -57,7 +58,7 @@ describe('LoginComponent', () => {
   it('should validate the form when email and password are correct', () => {
     component.form.setValue({
       email: 'test@example.com',
-      password: '123456'
+      password: '123456',
     });
 
     expect(component.form.valid).toBe(true);
@@ -67,13 +68,13 @@ describe('LoginComponent', () => {
   it('should set onError to true when login fails', () => {
     const authService = TestBed.inject(AuthService);
 
-    jest.spyOn(authService, 'login').mockReturnValue(
-      throwError(() => new Error('Invalid credentials'))
-    );
+    jest
+      .spyOn(authService, 'login')
+      .mockReturnValue(throwError(() => new Error('Invalid credentials')));
 
     component.form.setValue({
       email: 'test@example.com',
-      password: '123456'
+      password: '123456',
     });
 
     component.submit();
@@ -84,20 +85,60 @@ describe('LoginComponent', () => {
   // Verify that AuthService.login is called with the correct credentials
   it('should call authService.login with form credentials when form is valid', () => {
     const authService = TestBed.inject(AuthService);
-    const loginSpy = jest.spyOn(authService, 'login').mockReturnValue({
-      subscribe: () => {}
-    } as any);
+    const loginSpy = jest
+      .spyOn(authService, 'login')
+      .mockReturnValue(of({} as any));
 
     component.form.setValue({
       email: 'user@example.com',
-      password: '123456'
+      password: '123456',
     });
 
     component.submit();
 
     expect(loginSpy).toHaveBeenCalledWith({
       email: 'user@example.com',
-      password: '123456'
+      password: '123456',
     });
+  });
+
+  // Verify successful login creates session and navigates to sessions page
+  it('should log in and navigate on successful authentication', () => {
+    const mockResponse = {
+      token: 'mock-token',
+      type: 'Bearer',
+      id: 1,
+      username: 'jdoe',
+      firstName: 'John',
+      lastName: 'Doe',
+      admin: false,
+    };
+
+    const authService = TestBed.inject(AuthService);
+    const sessionService = TestBed.inject(SessionService);
+    const router = TestBed.inject(Router);
+
+    // Mock successful authentication
+    const loginSpy = jest
+      .spyOn(authService, 'login')
+      .mockReturnValue(of(mockResponse));
+
+    const sessionSpy = jest.spyOn(sessionService, 'logIn');
+    const routerSpy = jest.spyOn(router, 'navigate');
+
+    component.form.setValue({
+      email: 'test@example.com',
+      password: '123456',
+    });
+
+    component.submit();
+
+    // Verify the complete login flow
+    expect(loginSpy).toHaveBeenCalledWith({
+      email: 'test@example.com',
+      password: '123456',
+    });
+    expect(sessionSpy).toHaveBeenCalledWith(mockResponse);
+    expect(routerSpy).toHaveBeenCalledWith(['/sessions']);
   });
 });

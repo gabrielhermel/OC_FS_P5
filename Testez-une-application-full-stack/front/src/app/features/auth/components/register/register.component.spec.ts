@@ -9,6 +9,10 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { expect } from '@jest/globals';
 
 import { RegisterComponent } from './register.component';
+import { RouterTestingModule } from '@angular/router/testing';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
+import { of } from 'rxjs';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -24,7 +28,8 @@ describe('RegisterComponent', () => {
         MatCardModule,
         MatFormFieldModule,
         MatIconModule,
-        MatInputModule
+        MatInputModule,
+        RouterTestingModule
       ]
     })
       .compileComponents();
@@ -48,5 +53,35 @@ describe('RegisterComponent', () => {
     expect(form.get('firstName')?.hasError('required')).toBe(true);
     expect(form.get('lastName')?.hasError('required')).toBe(true);
     expect(form.get('password')?.hasError('required')).toBe(true);
+  });
+
+  // Successful registration should navigate to /login
+  it('should navigate to /login on successful registration', () => {
+    const authService = TestBed.inject(AuthService);
+    const router = TestBed.inject(Router);
+
+    // mock successful API response
+    jest.spyOn(authService, 'register').mockReturnValue(of(void 0));
+    const routerSpy = jest.spyOn(router, 'navigate');
+
+    // provide valid form data
+    component.form.setValue({
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@example.com',
+      password: '123456'
+    });
+
+    component.submit();
+
+    // confirm full success flow
+    expect(authService.register).toHaveBeenCalledWith({
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'john@example.com',
+      password: '123456'
+    });
+
+    expect(routerSpy).toHaveBeenCalledWith(['/login']);
   });
 });

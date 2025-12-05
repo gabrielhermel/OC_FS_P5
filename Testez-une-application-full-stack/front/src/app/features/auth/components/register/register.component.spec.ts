@@ -37,4 +37,16 @@ describe('RegisterComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  // Verify that form is invalid when required fields are empty
+  it('should invalidate the form when fields are empty', () => {
+    const form = component.form;
+
+    expect(form.valid).toBe(false);
+
+    expect(form.get('email')?.hasError('required')).toBe(true);
+    expect(form.get('firstName')?.hasError('required')).toBe(true);
+    expect(form.get('lastName')?.hasError('required')).toBe(true);
+    expect(form.get('password')?.hasError('required')).toBe(true);
+  });
 });

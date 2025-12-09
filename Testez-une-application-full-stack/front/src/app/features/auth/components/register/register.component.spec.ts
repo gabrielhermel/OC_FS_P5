@@ -12,7 +12,7 @@ import { RegisterComponent } from './register.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AuthService } from '../../services/auth.service';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 
 describe('RegisterComponent', () => {
   let component: RegisterComponent;
@@ -83,5 +83,26 @@ describe('RegisterComponent', () => {
     });
 
     expect(routerSpy).toHaveBeenCalledWith(['/login']);
+  });
+
+  // Verify that onError is set when registration fails
+  it('should set onError to true when register fails', () => {
+    const authService = TestBed.inject(AuthService);
+
+    // Mock register() to emit an error
+    jest
+      .spyOn(authService, 'register')
+      .mockReturnValue(throwError(() => new Error('Registration failed')));
+
+    component.form.setValue({
+      email: 'test@example.com',
+      firstName: 'John',
+      lastName: 'Doe',
+      password: '123456'
+    });
+
+    component.submit();
+
+    expect(component.onError).toBe(true);
   });
 });

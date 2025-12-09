@@ -24,15 +24,14 @@ describe('RegisterComponent', () => {
       imports: [
         BrowserAnimationsModule,
         HttpClientModule,
-        ReactiveFormsModule,  
+        ReactiveFormsModule,
         MatCardModule,
         MatFormFieldModule,
         MatIconModule,
         MatInputModule,
-        RouterTestingModule
-      ]
-    })
-      .compileComponents();
+        RouterTestingModule,
+      ],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(RegisterComponent);
     component = fixture.componentInstance;
@@ -69,7 +68,7 @@ describe('RegisterComponent', () => {
       firstName: 'John',
       lastName: 'Doe',
       email: 'john@example.com',
-      password: '123456'
+      password: '123456',
     });
 
     component.submit();
@@ -79,7 +78,7 @@ describe('RegisterComponent', () => {
       firstName: 'John',
       lastName: 'Doe',
       email: 'john@example.com',
-      password: '123456'
+      password: '123456',
     });
 
     expect(routerSpy).toHaveBeenCalledWith(['/login']);
@@ -98,11 +97,22 @@ describe('RegisterComponent', () => {
       email: 'test@example.com',
       firstName: 'John',
       lastName: 'Doe',
-      password: '123456'
+      password: '123456',
     });
 
     component.submit();
 
     expect(component.onError).toBe(true);
+  });
+
+  // Submit button should be disabled when form is invalid
+  it('should disable the submit button when the form is invalid', () => {
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector(
+      'button[type="submit"]'
+    );
+
+    // Form starts invalid (all fields empty)
+    expect(component.form.invalid).toBe(true);
+    expect(button.disabled).toBe(true);
   });
 });

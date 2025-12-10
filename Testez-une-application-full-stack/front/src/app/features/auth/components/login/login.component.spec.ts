@@ -36,6 +36,11 @@ describe('LoginComponent', () => {
     }).compileComponents();
     fixture = TestBed.createComponent(LoginComponent);
     component = fixture.componentInstance;
+
+    // Prevent Angular router from trying to navigate during tests
+    const router = TestBed.inject(Router);
+    jest.spyOn(router, 'navigate').mockResolvedValue(true);
+
     fixture.detectChanges();
   });
 

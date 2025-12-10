@@ -1,6 +1,6 @@
 import { HttpClientModule } from '@angular/common/http';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -114,5 +114,27 @@ describe('RegisterComponent', () => {
     // Form starts invalid (all fields empty)
     expect(component.form.invalid).toBe(true);
     expect(button.disabled).toBe(true);
+  });
+
+  // Verify that submit button is enabled when the form is valid
+  // NOTE:
+  //   Component uses Validators.min/max on string fields, which only validate numeric values.
+  //   This test currently verifies the actual UI behavior, not the correctness of the validation logic.
+  it('should enable the submit button when the form is valid', () => {
+    component.form.setValue({
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'test@example.com',
+      password: 'password', // non-numeric to avoid .max validator coercion
+    });
+    fixture.detectChanges(); // Update the DOM
+
+    const button: HTMLButtonElement = fixture.nativeElement.querySelector(
+      'button[type="submit"]'
+    );
+
+    // Angular considers the form valid even though the validators are not correct for strings
+    expect(component.form.valid).toBe(true);
+    expect(button.disabled).toBe(false);
   });
 });

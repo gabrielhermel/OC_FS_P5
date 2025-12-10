@@ -70,6 +70,10 @@ describe('ListComponent', () => {
     expect(cards[0].textContent).toContain(mockSessionName);
   });
 
+  // NOTE:
+  //   The testing plan mentions Detail button visibility being restricted to admins,
+  //   but the app UI currently displays it to all users, so this behavior is not tested.
+
   // Verify Create button visibility based on admin status
   it('should display the Create button when user is admin', () => {
     setupComponentWithAdminStatus(true);

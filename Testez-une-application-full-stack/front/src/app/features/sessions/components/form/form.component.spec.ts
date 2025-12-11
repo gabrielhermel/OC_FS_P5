@@ -110,4 +110,25 @@ describe('FormComponent', () => {
 
     expect(routerSpy).toHaveBeenCalledWith(['sessions']);
   });
+
+  // Verify that Save button is disabled when required fields are missing
+  it('should disable the Save button when form is invalid', () => {
+    setupComponentWithAdminStatus(true);
+
+    // Leave out "name" (required)
+    component.sessionForm?.setValue({
+      name: '',
+      date: mockSessionDate,
+      teacher_id: mockTeacherId,
+      description: mockDescription,
+    });
+
+    fixture.detectChanges();
+
+    const saveButton: HTMLButtonElement =
+      fixture.nativeElement.querySelector('button[type="submit"]');
+
+    expect(component.sessionForm?.invalid).toBe(true);
+    expect(saveButton.disabled).toBe(true);
+  });
 });

@@ -15,7 +15,7 @@ describe('ListComponent', () => {
   let component: ListComponent;
   let fixture: ComponentFixture<ListComponent>;
 
-  // Shared mock session
+  // Shared mock information
   const mockSessionId = 1;
   const mockSessionName = 'Yoga Session';
   const mockSession: Session = {

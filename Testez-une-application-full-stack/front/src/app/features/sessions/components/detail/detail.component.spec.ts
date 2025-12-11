@@ -1,5 +1,10 @@
 import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+} from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { RouterTestingModule } from '@angular/router/testing';
@@ -16,6 +21,8 @@ import { of } from 'rxjs';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('DetailComponent', () => {
   let component: DetailComponent;
@@ -77,12 +84,28 @@ describe('DetailComponent', () => {
         MatCardModule,
         MatIconModule,
         MatButtonModule,
+        NoopAnimationsModule,
       ],
       declarations: [DetailComponent],
       providers: [
+        // Mock ActivatedRoute to provide session ID
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              paramMap: {
+                get: (key: string) => mockSessionId.toString(),
+              },
+            },
+          },
+        },
+        // Mock SessionApiService to return mock session
         {
           provide: SessionApiService,
-          useValue: { detail: () => of(mockSession) },
+          useValue: {
+            detail: () => of(mockSession),
+            delete: () => of({}),
+          },
         },
         {
           provide: TeacherService,
@@ -100,7 +123,7 @@ describe('DetailComponent', () => {
 
   // Verify that session details are rendered correctly
   it('should display session information correctly', () => {
-    setupComponentWithAdminStatus(true); // or false, doesn't matter for this test
+    setupComponentWithAdminStatus(true);
 
     const native = fixture.nativeElement;
 
@@ -125,7 +148,6 @@ describe('DetailComponent', () => {
   it('should display the Delete button when user is admin', () => {
     setupComponentWithAdminStatus(true);
 
-    // Find button containing "Delete" text
     const deleteButton = Array.from(
       fixture.nativeElement.querySelectorAll('button')
     ).find((button: any) => button.textContent.includes('Delete'));
@@ -136,11 +158,32 @@ describe('DetailComponent', () => {
   it('should not display the Delete button when user is not admin', () => {
     setupComponentWithAdminStatus(false);
 
-    // Find button containing "Delete" text
     const deleteButton = Array.from(
       fixture.nativeElement.querySelectorAll('button')
     ).find((button: any) => button.textContent.includes('Delete'));
 
     expect(deleteButton).toBeFalsy();
   });
+
+  // Verify session deletion and navigation on delete
+  it('should delete the session and navigate to /sessions', fakeAsync(() => {
+    setupComponentWithAdminStatus(true);
+
+    const sessionApi = TestBed.inject(SessionApiService);
+    const router = TestBed.inject(Router);
+
+    const deleteSpy = jest.spyOn(sessionApi, 'delete').mockReturnValue(of({}));
+
+    const routerSpy = jest
+      .spyOn(router, 'navigate')
+      .mockResolvedValue(true as any);
+
+    component.delete();
+
+    // Flush all pending async tasks (delete observable, snackbar timer, navigation)
+    flush();
+
+    expect(deleteSpy).toHaveBeenCalledWith(mockSessionId.toString());
+    expect(routerSpy).toHaveBeenCalledWith(['sessions']);
+  }));
 });

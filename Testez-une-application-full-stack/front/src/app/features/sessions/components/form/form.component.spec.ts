@@ -184,4 +184,32 @@ describe('FormComponent', () => {
     // Verify navigation
     expect(mockRouter.navigate).toHaveBeenCalledWith(['sessions']);
   });
+
+  // Verify disabled Save button when required fields are missing in update mode
+  it('should disable the Save button when form is invalid in update mode', () => {
+    // Enter update mode
+    mockRouter.url = '/sessions/update/1';
+    (mockActivatedRoute.snapshot.paramMap.get as jest.Mock).mockReturnValue('1');
+
+    // Recreate component so ngOnInit runs with updated mocks
+    fixture = TestBed.createComponent(FormComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    // Make the form invalid (empty name)
+    component.sessionForm?.setValue({
+      name: '',
+      date: mockSessionDate,
+      teacher_id: mockTeacherId,
+      description: mockDescription,
+    });
+
+    fixture.detectChanges();
+
+    const saveButton: HTMLButtonElement =
+      fixture.nativeElement.querySelector('button[type="submit"]');
+
+    expect(component.sessionForm?.invalid).toBe(true);
+    expect(saveButton.disabled).toBe(true);
+  });
 });

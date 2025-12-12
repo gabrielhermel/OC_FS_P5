@@ -11,12 +11,12 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { expect } from '@jest/globals';
 import { SessionService } from 'src/app/services/session.service';
 import { SessionApiService } from '../../services/session-api.service';
-
 import { FormComponent } from './form.component';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { TeacherService } from 'src/app/services/teacher.service';
+import { Session } from '../../interfaces/session.interface';
 
 describe('FormComponent', () => {
   let component: FormComponent;
@@ -25,26 +25,49 @@ describe('FormComponent', () => {
   // Shared mock form values
   const mockSessionName = 'New Yoga Session';
   const mockSessionDate = '2025-01-01';
+  const mockSessionDateObj = new Date(mockSessionDate);
   const mockTeacherId = 1;
   const mockDescription = 'A new yoga session';
 
-  // Helper to recreate component with a given admin status
-  const setupComponentWithAdminStatus = (isAdmin: boolean) => {
-    TestBed.overrideProvider(SessionService, {
-      useValue: {
-        sessionInformation: {
-          admin: isAdmin,
-        },
-      },
-    });
+  // Existing session used in update mode
+  const mockExistingSession: Session = {
+    id: 1,
+    name: mockSessionName,
+    date: mockSessionDateObj,
+    teacher_id: mockTeacherId,
+    description: mockDescription,
+    users: [],
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
 
-    // Create component after mocking
-    fixture = TestBed.createComponent(FormComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  // Mock services shared across tests
+  const mockSessionService = {
+    sessionInformation: { admin: true },
+  };
+
+  const mockSessionApiService = {
+    create: jest.fn().mockReturnValue(of({ id: 1 })),
+    detail: jest.fn().mockReturnValue(of(mockExistingSession)),
+    update: jest.fn().mockReturnValue(of(mockExistingSession)),
+  };
+
+  const mockRouter = {
+    navigate: jest.fn().mockResolvedValue(true),
+    url: '/sessions/create', // default
+  };
+
+  const mockActivatedRoute = {
+    snapshot: {
+      paramMap: {
+        get: jest.fn().mockReturnValue(null), // default (create mode)
+      },
+    },
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
@@ -59,36 +82,33 @@ describe('FormComponent', () => {
         NoopAnimationsModule,
       ],
       providers: [
-        {
-          provide: TeacherService,
-          useValue: { all: () => of([]) },
-        },
-        SessionApiService,
+        { provide: SessionService, useValue: mockSessionService },
+        { provide: SessionApiService, useValue: mockSessionApiService },
+        { provide: Router, useValue: mockRouter },
+        { provide: ActivatedRoute, useValue: mockActivatedRoute },
+        { provide: TeacherService, useValue: { all: () => of([]) } },
       ],
       declarations: [FormComponent],
     }).compileComponents();
+
+    // Create component instance
+    fixture = TestBed.createComponent(FormComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
+  // Verify component creation
   it('should create', () => {
-    setupComponentWithAdminStatus(true);
     expect(component).toBeTruthy();
   });
 
-  // Verify session creation and navigation on submit
+  // Verify session creation flow
   it('should create a session and navigate to /sessions on submit', () => {
-    setupComponentWithAdminStatus(true);
-
-    const sessionApi = TestBed.inject(SessionApiService);
-    const router = TestBed.inject(Router);
-
-    // Mock successful session creation
-    const createSpy = jest
-      .spyOn(sessionApi, 'create')
-      .mockReturnValue(of({ id: 1 } as any));
-
-    const routerSpy = jest
-      .spyOn(router, 'navigate')
-      .mockResolvedValue(true as any);
+    // Ensure create mode
+    mockRouter.url = '/sessions/create';
+    (mockActivatedRoute.snapshot.paramMap.get as jest.Mock).mockReturnValue(
+      null
+    );
 
     // Provide valid form values
     component.sessionForm?.setValue({
@@ -100,22 +120,20 @@ describe('FormComponent', () => {
 
     component.submit();
 
-    // Verify full creation flow
-    expect(createSpy).toHaveBeenCalledWith({
+    // Verify session creation call
+    expect(mockSessionApiService.create).toHaveBeenCalledWith({
       name: mockSessionName,
       date: mockSessionDate,
       teacher_id: mockTeacherId,
       description: mockDescription,
     });
 
-    expect(routerSpy).toHaveBeenCalledWith(['sessions']);
+    // Verify navigation
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['sessions']);
   });
 
-  // Verify that Save button is disabled when required fields are missing
+  // Verify disabled Save button when required fields are missing
   it('should disable the Save button when form is invalid', () => {
-    setupComponentWithAdminStatus(true);
-
-    // Leave out "name" (required)
     component.sessionForm?.setValue({
       name: '',
       date: mockSessionDate,
@@ -125,10 +143,45 @@ describe('FormComponent', () => {
 
     fixture.detectChanges();
 
-    const saveButton: HTMLButtonElement =
-      fixture.nativeElement.querySelector('button[type="submit"]');
+    const saveButton: HTMLButtonElement = fixture.nativeElement.querySelector(
+      'button[type="submit"]'
+    );
 
     expect(component.sessionForm?.invalid).toBe(true);
     expect(saveButton.disabled).toBe(true);
+  });
+
+  // Verify session update flow
+  it('should update a session and navigate to /sessions on submit', () => {
+    // Enter update mode
+    mockRouter.url = '/sessions/update/1';
+    (mockActivatedRoute.snapshot.paramMap.get as jest.Mock).mockReturnValue(
+      '1'
+    );
+
+    // Recreate component so ngOnInit runs with updated mocks
+    fixture = TestBed.createComponent(FormComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+
+    // Updated values
+    const mockUpdatedSessionValues = {
+      name: mockSessionName + ' updated',
+      date: mockSessionDate,
+      teacher_id: mockTeacherId,
+      description: mockDescription + ' updated',
+    };
+
+    component.sessionForm?.setValue(mockUpdatedSessionValues);
+    component.submit();
+
+    // Verify update call
+    expect(mockSessionApiService.update).toHaveBeenCalledWith(
+      '1',
+      mockUpdatedSessionValues
+    );
+
+    // Verify navigation
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['sessions']);
   });
 });

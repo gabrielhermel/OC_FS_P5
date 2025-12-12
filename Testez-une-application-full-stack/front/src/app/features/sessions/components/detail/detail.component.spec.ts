@@ -75,6 +75,8 @@ describe('DetailComponent', () => {
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,

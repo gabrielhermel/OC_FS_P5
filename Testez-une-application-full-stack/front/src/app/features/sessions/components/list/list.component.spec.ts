@@ -44,6 +44,8 @@ describe('ListComponent', () => {
   };
 
   beforeEach(async () => {
+    jest.clearAllMocks();
+
     await TestBed.configureTestingModule({
       declarations: [ListComponent],
       imports: [

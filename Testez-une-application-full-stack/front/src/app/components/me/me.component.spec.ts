@@ -109,4 +109,15 @@ describe('MeComponent', () => {
       )
     );
   });
+
+  // Verify back() triggers browser history navigation
+  it('should go back when back() is called', () => {
+    const backSpy = jest
+      .spyOn(window.history, 'back')
+      .mockImplementation(() => undefined);
+
+    component.back();
+
+    expect(backSpy).toHaveBeenCalled();
+  });
 });

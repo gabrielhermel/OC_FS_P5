@@ -1,10 +1,15 @@
 import { HttpClientModule } from '@angular/common/http';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  ComponentFixture,
+  fakeAsync,
+  flush,
+  TestBed,
+} from '@angular/core/testing';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { SessionService } from 'src/app/services/session.service';
 
 import { MeComponent } from './me.component';
@@ -47,6 +52,10 @@ describe('MeComponent', () => {
     navigate: jest.fn().mockResolvedValue(true as any),
   };
 
+  const mockSnackBar = {
+    open: jest.fn(),
+  };
+
   beforeEach(async () => {
     jest.clearAllMocks();
 
@@ -64,6 +73,7 @@ describe('MeComponent', () => {
         { provide: SessionService, useValue: mockSessionService },
         { provide: UserService, useValue: mockUserService },
         { provide: Router, useValue: mockRouter },
+        { provide: MatSnackBar, useValue: mockSnackBar },
       ],
     }).compileComponents();
 
@@ -120,4 +130,22 @@ describe('MeComponent', () => {
 
     expect(backSpy).toHaveBeenCalled();
   });
+
+  // Verify user deletion flow
+  it('should delete the user, log out, and navigate to home', fakeAsync(() => {
+    component.delete();
+
+    flush();
+
+    expect(mockUserService.delete).toHaveBeenCalledWith(
+      mockSessionService.sessionInformation.id.toString()
+    );
+    expect(mockSnackBar.open).toHaveBeenCalledWith(
+      'Your account has been deleted !',
+      'Close',
+      { duration: 3000 }
+    );
+    expect(mockSessionService.logOut).toHaveBeenCalled();
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/']);
+  }));
 });

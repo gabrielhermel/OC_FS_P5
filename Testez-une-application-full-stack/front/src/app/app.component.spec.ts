@@ -7,6 +7,7 @@ import { expect } from '@jest/globals';
 import { AppComponent } from './app.component';
 import { SessionService } from './services/session.service';
 import { Router } from '@angular/router';
+import { of } from 'rxjs';
 
 
 describe('AppComponent', () => {
@@ -27,6 +28,21 @@ describe('AppComponent', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
     expect(app).toBeTruthy();
+  });
+
+  // Verify $isLogged delegates to SessionService
+  it('should expose isLogged observable from SessionService', (done) => {
+    const sessionService = TestBed.inject(SessionService);
+
+    jest.spyOn(sessionService, '$isLogged').mockReturnValue(of(true));
+
+    const fixture = TestBed.createComponent(AppComponent);
+    const component = fixture.componentInstance;
+
+    component.$isLogged().subscribe((value) => {
+      expect(value).toBe(true);
+      done();
+    });
   });
 
   // Verify user logout

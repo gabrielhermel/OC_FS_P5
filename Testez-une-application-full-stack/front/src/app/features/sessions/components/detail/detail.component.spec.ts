@@ -188,4 +188,17 @@ describe('DetailComponent', () => {
     expect(deleteSpy).toHaveBeenCalledWith(mockSessionId.toString());
     expect(routerSpy).toHaveBeenCalledWith(['sessions']);
   }));
+
+  // Verify back navigation
+  it('should go back when back() is called', () => {
+    setupComponentWithAdminStatus(true);
+
+    const backSpy = jest
+      .spyOn(window.history, 'back')
+      .mockImplementation(() => {});
+
+    component.back();
+
+    expect(backSpy).toHaveBeenCalled();
+  });
 });

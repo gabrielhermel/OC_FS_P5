@@ -107,6 +107,7 @@ describe('DetailComponent', () => {
           useValue: {
             detail: () => of(mockSession),
             delete: () => of({}),
+            participate: () => of(void 0),
           },
         },
         {
@@ -201,4 +202,21 @@ describe('DetailComponent', () => {
 
     expect(backSpy).toHaveBeenCalled();
   });
+
+  // Verify that participate() calls the API and refreshes session data
+  it('should participate in the session and refresh session data', fakeAsync(() => {
+    setupComponentWithAdminStatus(true);
+
+    const sessionApi = TestBed.inject(SessionApiService);
+
+    const participateSpy = jest.spyOn(sessionApi, 'participate');
+    const detailSpy = jest.spyOn(sessionApi, 'detail');
+
+    component.participate();
+
+    flush();
+
+    expect(participateSpy).toHaveBeenCalledWith(mockSessionId.toString(), '1');
+    expect(detailSpy).toHaveBeenCalled();
+  }));
 });

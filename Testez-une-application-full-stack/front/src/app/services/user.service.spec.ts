@@ -52,4 +52,16 @@ describe('UserService', () => {
 
     req.flush(mockUser);
   });
+
+  // Verify user is deleted by ID
+  it('should delete a user by id', () => {
+    service.delete(mockUserId).subscribe((res) => {
+      expect(res).toBeDefined();
+    });
+
+    const req = httpMock.expectOne(`api/user/${mockUserId}`);
+    expect(req.request.method).toBe('DELETE');
+
+    req.flush({});
+  });
 });

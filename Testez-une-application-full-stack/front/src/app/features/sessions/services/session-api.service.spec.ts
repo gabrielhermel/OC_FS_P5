@@ -66,4 +66,15 @@ describe('SessionApiService', () => {
     req.flush(mockSession);
   });
 
+  // Verify session deletion
+  it('should delete a session', () => {
+    service.delete(mockSessionId.toString()).subscribe((res) => {
+      expect(res).toEqual({});
+    });
+
+    const req = httpMock.expectOne(`api/session/${mockSessionId}`);
+    expect(req.request.method).toBe('DELETE');
+
+    req.flush({});
+  });
 });

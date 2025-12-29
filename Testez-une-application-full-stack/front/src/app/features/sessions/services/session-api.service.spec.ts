@@ -90,4 +90,24 @@ describe('SessionApiService', () => {
 
     req.flush(mockSession);
   });
+
+  // Verify session update
+  it('should update a session', () => {
+    const updatedSession: Session = {
+      ...mockSession,
+      name: 'Updated Yoga Session',
+    };
+
+    service
+      .update(mockSessionId.toString(), updatedSession)
+      .subscribe((session) => {
+        expect(session).toEqual(updatedSession);
+      });
+
+    const req = httpMock.expectOne(`api/session/${mockSessionId}`);
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual(updatedSession);
+
+    req.flush(updatedSession);
+  });
 });

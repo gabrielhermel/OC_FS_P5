@@ -53,4 +53,17 @@ describe('SessionApiService', () => {
 
     req.flush(mockSessions);
   });
+
+  // Verify session detail is fetched by id
+  it('should fetch a session by id', () => {
+    service.detail(mockSessionId.toString()).subscribe((session) => {
+      expect(session).toEqual(mockSession);
+    });
+
+    const req = httpMock.expectOne(`api/session/${mockSessionId}`);
+    expect(req.request.method).toBe('GET');
+
+    req.flush(mockSession);
+  });
+
 });

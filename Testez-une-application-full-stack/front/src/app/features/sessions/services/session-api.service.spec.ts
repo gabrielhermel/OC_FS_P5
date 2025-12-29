@@ -77,4 +77,17 @@ describe('SessionApiService', () => {
 
     req.flush({});
   });
+
+  // Verify session creation
+  it('should create a new session', () => {
+    service.create(mockSession).subscribe((session) => {
+      expect(session).toEqual(mockSession);
+    });
+
+    const req = httpMock.expectOne('api/session');
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual(mockSession);
+
+    req.flush(mockSession);
+  });
 });

@@ -14,6 +14,7 @@ describe('SessionApiService', () => {
 
   // Shared mock information
   const mockSessionId = 1;
+  const mockUserId = 1;
   const mockSession: Session = {
     id: mockSessionId,
     name: 'Yoga Session',
@@ -35,7 +36,7 @@ describe('SessionApiService', () => {
   });
 
   afterEach(() => {
-    httpMock.verify();
+    httpMock.verify(); // Ensure no outstanding HTTP requests
   });
 
   it('should be created', () => {
@@ -109,5 +110,23 @@ describe('SessionApiService', () => {
     expect(req.request.body).toEqual(updatedSession);
 
     req.flush(updatedSession);
+  });
+
+  // Verify user participation in session
+  it('should participate in a session', () => {
+    service
+      .participate(mockSessionId.toString(), mockUserId.toString())
+      .subscribe((res) => {
+        expect(res).toBeUndefined();
+      });
+
+    const req = httpMock.expectOne(
+      `api/session/${mockSessionId}/participate/${mockUserId}`
+    );
+
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toBeNull();
+
+    req.flush(null);
   });
 });

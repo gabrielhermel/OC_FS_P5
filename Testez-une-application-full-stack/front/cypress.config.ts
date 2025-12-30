@@ -1,4 +1,7 @@
-import { defineConfig } from 'cypress'
+import { defineConfig } from 'cypress';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const codeCoverageTask = require('@cypress/code-coverage/task');
 
 export default defineConfig({
   videosFolder: 'cypress/videos',
@@ -6,11 +9,10 @@ export default defineConfig({
   fixturesFolder: 'cypress/fixtures',
   video: false,
   e2e: {
-    // We've imported your old cypress plugins here.
-    // You may want to clean this up later by importing these.
     setupNodeEvents(on, config) {
-      return require('./cypress/plugins/index.ts').default(on, config)
+      codeCoverageTask(on, config);
+      return config;
     },
     baseUrl: 'http://localhost:4200',
   },
-})
+});

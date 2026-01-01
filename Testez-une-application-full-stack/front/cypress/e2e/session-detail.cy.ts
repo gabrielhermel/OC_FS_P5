@@ -108,4 +108,30 @@ describe('Session Detail spec', () => {
     cy.url().should('include', '/sessions');
     cy.url().should('not.include', '/detail');
   });
+
+  it('should delete session and navigate to sessions list when admin clicks delete', () => {
+    // Mock the delete API call
+    cy.intercept('DELETE', `/api/session/${mockSession.id}`, {
+      statusCode: 200,
+      body: {},
+    }).as('deleteSession');
+
+    loginAndNavigateToDetail(true); // Login as admin
+
+    // Verify Delete button is visible for admin
+    cy.contains('button', 'Delete').should('be.visible');
+
+    // Click the Delete button
+    cy.contains('button', 'Delete').click();
+
+    // Wait for delete API call
+    cy.wait('@deleteSession');
+
+    // Verify navigation back to sessions list
+    cy.url().should('include', '/sessions');
+    cy.url().should('not.include', '/detail');
+
+    // Verify snackbar message is displayed
+    cy.contains('Session deleted !').should('be.visible');
+  });
 });

@@ -134,4 +134,45 @@ describe('Session Detail spec', () => {
     // Verify snackbar message is displayed
     cy.contains('Session deleted !').should('be.visible');
   });
+
+  it('should allow user to participate in session', () => {
+    loginAndNavigateToDetail(false);
+
+    // Verify Participate button is visible
+    cy.contains('button', 'Participate').should('be.visible');
+
+    // Update intercepts for after participation
+    const updatedSession = {
+      ...mockSession,
+      users: [...mockSessionParticipantArr, mockUser.id],
+    };
+
+    cy.intercept(
+      'POST',
+      `/api/session/${mockSession.id}/participate/${mockUser.id}`,
+      {
+        statusCode: 200,
+        body: null,
+      }
+    ).as('participate');
+
+    cy.intercept('GET', `/api/session/${mockSession.id}`, updatedSession).as(
+      'sessionDetailRefresh'
+    );
+
+    cy.intercept('GET', `/api/teacher/${mockTeacher.id}`, mockTeacher).as(
+      'teacherDetailRefresh'
+    );
+
+    // Click Participate button
+    cy.contains('button', 'Participate').click();
+
+    // Wait for API calls
+    cy.wait('@participate');
+    cy.wait('@sessionDetailRefresh');
+
+    // Verify button changed to "Do not participate"
+    cy.contains('button', 'Do not participate').should('be.visible');
+    cy.contains('button', 'Participate').should('not.exist');
+  });
 });

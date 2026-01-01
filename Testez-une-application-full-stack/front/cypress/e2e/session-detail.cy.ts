@@ -18,6 +18,14 @@ describe('Session Detail spec', () => {
     admin: false,
   };
 
+  const mockAdminUser = {
+    id: 2,
+    username: 'adminUser',
+    firstName: 'Admin',
+    lastName: 'User',
+    admin: true,
+  };
+
   const mockSessionParticipantArr = [2, 3]; // mockUser is not participating
 
   const mockSession = {
@@ -31,18 +39,18 @@ describe('Session Detail spec', () => {
     updatedAt: '2025-01-02T00:00:00.000Z',
   };
 
-  it('should display session details for a regular user', () => {
+  // Helper function to log in and navigate to session detail page
+  const loginAndNavigateToDetail = (admin: boolean) => {
+    const user = admin ? mockAdminUser : mockUser;
+
     // Set up intercepts
     cy.intercept('POST', '/api/auth/login', {
-      body: mockUser,
+      body: user,
     }).as('login');
-
     cy.intercept('GET', '/api/session', [mockSession]).as('sessions');
-
     cy.intercept('GET', `/api/session/${mockSession.id}`, mockSession).as(
       'sessionDetail'
     );
-
     cy.intercept('GET', `/api/teacher/${mockTeacher.id}`, mockTeacher).as(
       'teacherDetail'
     );
@@ -68,6 +76,10 @@ describe('Session Detail spec', () => {
     // Wait for detail page API calls
     cy.wait('@sessionDetail');
     cy.wait('@teacherDetail');
+  };
+
+  it('should display session details for a regular user', () => {
+    loginAndNavigateToDetail(false);
 
     // Verify session details display correctly
     cy.contains(toTitleCase(mockSession.name)).should('be.visible');
@@ -84,5 +96,16 @@ describe('Session Detail spec', () => {
 
     // Verify Delete button is not visible
     cy.contains('button', 'Delete').should('not.exist');
+  });
+
+  it('should navigate back to sessions list when back button is clicked', () => {
+    loginAndNavigateToDetail(false);
+
+    // Click the back button
+    cy.get('button[mat-icon-button]').contains('arrow_back').parent().click();
+
+    // Verify navigation back to sessions list
+    cy.url().should('include', '/sessions');
+    cy.url().should('not.include', '/detail');
   });
 });

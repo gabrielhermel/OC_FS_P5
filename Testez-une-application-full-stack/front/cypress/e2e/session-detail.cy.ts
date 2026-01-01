@@ -40,7 +40,7 @@ describe('Session Detail spec', () => {
   };
 
   // Helper function to log in and navigate to session detail page
-  const loginAndNavigateToDetail = (admin: boolean) => {
+  const loginAndNavigateToDetail = (admin: boolean, session = mockSession) => {
     const user = admin ? mockAdminUser : mockUser;
 
     // Set up intercepts
@@ -48,7 +48,7 @@ describe('Session Detail spec', () => {
       body: user,
     }).as('login');
     cy.intercept('GET', '/api/session', [mockSession]).as('sessions');
-    cy.intercept('GET', `/api/session/${mockSession.id}`, mockSession).as(
+    cy.intercept('GET', `/api/session/${mockSession.id}`, session).as(
       'sessionDetail'
     );
     cy.intercept('GET', `/api/teacher/${mockTeacher.id}`, mockTeacher).as(
@@ -174,5 +174,52 @@ describe('Session Detail spec', () => {
     // Verify button changed to "Do not participate"
     cy.contains('button', 'Do not participate').should('be.visible');
     cy.contains('button', 'Participate').should('not.exist');
+  });
+
+  it('should allow user to unparticipate from session', () => {
+    // Mock session where user is participating
+    const sessionWithUserParticipating = {
+      ...mockSession,
+      users: [...mockSessionParticipantArr, mockUser.id],
+    };
+
+    loginAndNavigateToDetail(false, sessionWithUserParticipating);
+
+    // Verify "Do not participate" button is visible
+    cy.contains('button', 'Do not participate').should('be.visible');
+
+    // Update intercepts for after unparticipation
+    const updatedSession = {
+      ...mockSession,
+      users: mockSessionParticipantArr,
+    };
+
+    cy.intercept(
+      'DELETE',
+      `/api/session/${mockSession.id}/participate/${mockUser.id}`,
+      {
+        statusCode: 200,
+        body: null,
+      }
+    ).as('unparticipate');
+
+    cy.intercept('GET', `/api/session/${mockSession.id}`, updatedSession).as(
+      'sessionDetailRefresh'
+    );
+
+    cy.intercept('GET', `/api/teacher/${mockTeacher.id}`, mockTeacher).as(
+      'teacherDetailRefresh'
+    );
+
+    // Click "Do not participate" button
+    cy.contains('button', 'Do not participate').click();
+
+    // Wait for API calls
+    cy.wait('@unparticipate');
+    cy.wait('@sessionDetailRefresh');
+
+    // Verify button changed to "Participate"
+    cy.contains('button', 'Participate').should('be.visible');
+    cy.contains('button', 'Do not participate').should('not.exist');
   });
 });

@@ -32,7 +32,8 @@ describe('Me (User Profile) spec', () => {
     updatedAt: '2024-06-01T00:00:00.000Z',
   };
 
-  it('should display user information for regular user', () => {
+  // Helper function to log in as regular user and navigate to /me page
+  const loginAndNavigateToMePage = () => {
     // Set up intercepts
     cy.intercept('POST', '/api/auth/login', {
       body: mockUserLoginInfo,
@@ -56,6 +57,10 @@ describe('Me (User Profile) spec', () => {
     });
 
     cy.wait('@userDetail');
+  };
+
+  it('should display user information for regular user', () => {
+    loginAndNavigateToMePage();
 
     // Verify user information is displayed
     cy.contains('h1', 'User information').should('be.visible');
@@ -77,7 +82,9 @@ describe('Me (User Profile) spec', () => {
       body: mockAdminLoginInfo,
     }).as('login');
     cy.intercept('GET', '/api/session', []).as('sessions');
-    cy.intercept('GET', `/api/user/${mockAdminUser.id}`, mockAdminUser).as('userDetail');
+    cy.intercept('GET', `/api/user/${mockAdminUser.id}`, mockAdminUser).as(
+      'userDetail'
+    );
 
     // Login as admin
     cy.visit('/login');
@@ -101,5 +108,15 @@ describe('Me (User Profile) spec', () => {
 
     // Verify delete button is not visible for admin
     cy.contains('button', 'Detail').should('not.exist'); // Note: template has typo "Detail" instead of "Delete"
+  });
+
+  it('should navigate back when back button is clicked', () => {
+    loginAndNavigateToMePage();
+
+    // Click back button
+    cy.get('button[mat-icon-button]').contains('arrow_back').parent().click();
+
+    // Verify navigation back to sessions
+    cy.url().should('include', '/sessions');
   });
 });

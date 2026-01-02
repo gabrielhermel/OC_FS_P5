@@ -119,4 +119,26 @@ describe('Me (User Profile) spec', () => {
     // Verify navigation back to sessions
     cy.url().should('include', '/sessions');
   });
+
+  it('should delete account and navigate to home when delete button is clicked', () => {
+    // Mock the delete API call
+    cy.intercept('DELETE', `/api/user/${mockUser.id}`, {
+      statusCode: 200,
+      body: {},
+    }).as('deleteUser');
+
+    loginAndNavigateToMePage();
+
+    // Click delete button
+    cy.contains('button', 'Detail').click();
+
+    // Wait for delete API call
+    cy.wait('@deleteUser');
+
+    // Verify snackbar message
+    cy.contains('Your account has been deleted !').should('be.visible');
+
+    // Verify navigation to home page
+    cy.url().should('eq', Cypress.config().baseUrl);
+  });
 });

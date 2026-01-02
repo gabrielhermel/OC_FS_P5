@@ -1,23 +1,35 @@
 describe('Me (User Profile) spec', () => {
   // Shared mock data
-  const mockUser = {
-    id: 1,
-    username: 'johnDoe',
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'jdoe@mail.com',
-    admin: false,
-    password: 'password',
-    createdAt: '2024-01-01T00:00:00.000Z',
-    updatedAt: '2024-06-01T00:00:00.000Z',
-  };
-
   const mockUserLoginInfo = {
     id: 1,
     username: 'johnDoe',
     firstName: 'John',
     lastName: 'Doe',
     admin: false,
+  };
+
+  const mockUser = {
+    ...mockUserLoginInfo,
+    email: 'jdoe@mail.com',
+    password: 'password',
+    createdAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-06-01T00:00:00.000Z',
+  };
+
+  const mockAdminLoginInfo = {
+    id: 2,
+    username: 'adminUser',
+    firstName: 'Admin',
+    lastName: 'User',
+    admin: true,
+  };
+
+  const mockAdminUser = {
+    ...mockAdminLoginInfo,
+    email: 'admin@test.com',
+    password: 'password',
+    createdAt: '2024-01-01T00:00:00.000Z',
+    updatedAt: '2024-06-01T00:00:00.000Z',
   };
 
   it('should display user information for regular user', () => {
@@ -30,8 +42,8 @@ describe('Me (User Profile) spec', () => {
 
     // Login
     cy.visit('/login');
-    cy.get('input[formControlName=email]').type('john.doe@test.com');
-    cy.get('input[formControlName=password]').type('password');
+    cy.get('input[formControlName=email]').type(mockUser.email);
+    cy.get('input[formControlName=password]').type(mockUser.password);
     cy.get('button[type=submit]').click();
 
     cy.wait('@login');
@@ -55,7 +67,39 @@ describe('Me (User Profile) spec', () => {
     // Verify delete button is visible for non-admin
     cy.contains('button', 'Detail').should('be.visible'); // Note: template has typo "Detail" instead of "Delete"
 
-    // Verify admin message is NOT visible
+    // Verify admin message is not visible
     cy.contains('You are admin').should('not.exist');
+  });
+
+  it('should display admin message for admin user', () => {
+    // Set up intercepts
+    cy.intercept('POST', '/api/auth/login', {
+      body: mockAdminLoginInfo,
+    }).as('login');
+    cy.intercept('GET', '/api/session', []).as('sessions');
+    cy.intercept('GET', `/api/user/${mockAdminUser.id}`, mockAdminUser).as('userDetail');
+
+    // Login as admin
+    cy.visit('/login');
+    cy.get('input[formControlName=email]').type(mockAdminUser.email);
+    cy.get('input[formControlName=password]').type(mockAdminUser.password);
+    cy.get('button[type=submit]').click();
+
+    cy.wait('@login');
+    cy.wait('@sessions');
+
+    // Navigate to me page using pushState
+    cy.window().then((win) => {
+      win.history.pushState({}, '', '/me');
+      win.dispatchEvent(new PopStateEvent('popstate'));
+    });
+
+    cy.wait('@userDetail');
+
+    // Verify admin message is visible
+    cy.contains('You are admin').should('be.visible');
+
+    // Verify delete button is not visible for admin
+    cy.contains('button', 'Detail').should('not.exist'); // Note: template has typo "Detail" instead of "Delete"
   });
 });

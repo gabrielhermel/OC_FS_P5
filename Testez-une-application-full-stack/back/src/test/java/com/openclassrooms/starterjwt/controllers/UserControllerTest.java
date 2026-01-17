@@ -40,7 +40,7 @@ class UserControllerTest {
 
   @Test
   @WithMockUser
-  void testFindUserById() throws Exception {
+  void findUserById_withExistingId_returnsUser() throws Exception {
     // When & Then
     mockMvc.perform(get("/api/user/" + testUser.getId()))
         .andExpect(status().isOk())
@@ -51,7 +51,7 @@ class UserControllerTest {
 
   @Test
   @WithMockUser
-  void testFindUserByIdNotFound() throws Exception {
+  void findUserById_withNonExistentId_returnsNotFound() throws Exception {
     // When & Then
     mockMvc.perform(get("/api/user/999999"))
         .andExpect(status().isNotFound());
@@ -59,7 +59,7 @@ class UserControllerTest {
 
   @Test
   @WithMockUser
-  void testFindUserByIdInvalidFormat() throws Exception {
+  void findUserById_withInvalidIdFormat_returnsBadRequest() throws Exception {
     // When & Then
     mockMvc.perform(get("/api/user/invalid"))
         .andExpect(status().isBadRequest());
@@ -67,7 +67,7 @@ class UserControllerTest {
 
   @Test
   @WithMockUser(username = "usertest@test.com")
-  void testDeleteUser() throws Exception {
+  void deleteUser_asOwner_returnsOkAndRemovesUser() throws Exception {
     // When & Then
     mockMvc.perform(delete("/api/user/" + testUser.getId()))
         .andExpect(status().isOk());
@@ -79,7 +79,7 @@ class UserControllerTest {
 
   @Test
   @WithMockUser(username = "different@test.com")
-  void testDeleteUserUnauthorized() throws Exception {
+  void deleteUser_asOtherUser_returnsUnauthorized() throws Exception {
     // When & Then (Try to delete another user's account)
     mockMvc.perform(delete("/api/user/" + testUser.getId()))
         .andExpect(status().isUnauthorized());

@@ -64,7 +64,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testCreateSession() throws Exception {
+  void createSession_withValidData_returnsCreatedSession() throws Exception {
     // Given
     SessionDto sessionDto = new SessionDto();
     sessionDto.setName("Yoga Session");
@@ -83,7 +83,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testFindAllSessions() throws Exception {
+  void findAllSessions_whenCalled_returnsSessionArray() throws Exception {
     // When & Then
     mockMvc.perform(get("/api/session"))
         .andExpect(status().isOk())
@@ -92,7 +92,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testFindSessionById() throws Exception {
+  void findSessionById_withExistingId_returnsSession() throws Exception {
     // Given (Create a session first)
     SessionDto sessionDto = new SessionDto();
     sessionDto.setName("Test Session");
@@ -115,7 +115,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testFindSessionByIdNotFound() throws Exception {
+  void findSessionById_withNonExistentId_returnsNotFound() throws Exception {
     // When & Then
     mockMvc.perform(get("/api/session/999999"))
         .andExpect(status().isNotFound());
@@ -123,7 +123,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testFindSessionByIdInvalidFormat() throws Exception {
+  void findSessionById_withInvalidIdFormat_returnsBadRequest() throws Exception {
     // When & Then
     mockMvc.perform(get("/api/session/invalid"))
         .andExpect(status().isBadRequest());
@@ -131,7 +131,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testUpdateSession() throws Exception {
+  void updateSession_withValidData_returnsUpdatedSession() throws Exception {
     // Given (Create a session first)
     SessionDto sessionDto = new SessionDto();
     sessionDto.setName("Original Session");
@@ -161,7 +161,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testUpdateSessionInvalidFormat() throws Exception {
+  void updateSession_withInvalidIdFormat_returnsBadRequest() throws Exception {
     // Given
     SessionDto sessionDto = new SessionDto();
     sessionDto.setName("Test");
@@ -177,7 +177,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testDeleteSession() throws Exception {
+  void deleteSession_withExistingId_returnsOkAndRemovesSession() throws Exception {
     // Given (Create a session first)
     SessionDto sessionDto = new SessionDto();
     sessionDto.setName("Session to Delete");
@@ -203,7 +203,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testDeleteSessionNotFound() throws Exception {
+  void deleteSession_withNonExistentId_returnsNotFound() throws Exception {
     // When & Then
     mockMvc.perform(delete("/api/session/999999"))
         .andExpect(status().isNotFound());
@@ -211,7 +211,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testDeleteSessionInvalidFormat() throws Exception {
+  void deleteSession_withInvalidIdFormat_returnsBadRequest() throws Exception {
     // When & Then
     mockMvc.perform(delete("/api/session/invalid"))
         .andExpect(status().isBadRequest());
@@ -219,7 +219,7 @@ class SessionControllerTest {
 
   @Test
   @WithMockUser
-  void testParticipateInSession() throws Exception {
+  void participateInSession_withValidIds_returnsOk() throws Exception {
     // Given (Create a session first)
     SessionDto sessionDto = new SessionDto();
     sessionDto.setName("Participation Session");

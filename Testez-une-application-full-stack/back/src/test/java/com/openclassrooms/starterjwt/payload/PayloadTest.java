@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PayloadTest {
 
   @Test
-  void testLoginRequest() {
+  void setAndGet_withLoginRequestProperties_returnsCorrectValues() {
     // Given
     LoginRequest request = new LoginRequest();
 
@@ -25,7 +25,7 @@ class PayloadTest {
   }
 
   @Test
-  void testSignupRequest() {
+  void setAndGet_withSignupRequestProperties_returnsCorrectValues() {
     // Given
     SignupRequest request = new SignupRequest();
 
@@ -43,7 +43,7 @@ class PayloadTest {
   }
 
   @Test
-  void testSignupRequestEqualsAndHashCode() {
+  void equalsAndHashCode_withIdenticalSignupRequests_returnsEqual() {
     // Given
     SignupRequest request1 = new SignupRequest();
     request1.setEmail("test@test.com");
@@ -64,7 +64,7 @@ class PayloadTest {
   }
 
   @Test
-  void testJwtResponse() {
+  void constructor_withJwtResponseData_createsInstanceAndAllowsModification() {
     // Given & When
     JwtResponse response = new JwtResponse(
         "token123",
@@ -103,7 +103,7 @@ class PayloadTest {
   }
 
   @Test
-  void testMessageResponse() {
+  void constructor_withMessage_createsInstanceAndAllowsModification() {
     // Given & When
     MessageResponse response = new MessageResponse("Success");
 
@@ -116,7 +116,7 @@ class PayloadTest {
   }
 
   @Test
-  void testSignupRequestEqualsDifferentValues() {
+  void equals_withDifferentSignupRequests_returnsNotEqual() {
     // Given
     SignupRequest request1 = new SignupRequest();
     request1.setEmail("test1@test.com");
@@ -136,7 +136,4 @@ class PayloadTest {
     assertNotEquals(null, request1);
     assertNotEquals(new Object(), request1);
   }
-
-  // NOTE: SignupRequest branch coverage at 42% due to Lombok @Data annotation which
-  // generates complex equals() and hashCode() methods with numerous conditional branches
 }

@@ -32,7 +32,7 @@ class MapperTest {
   private SessionMapper sessionMapper;
 
   @Test
-  void testUserToDto() {
+  void toDto_withUserEntity_returnsUserDto() {
     // Given
     User user = new User();
     user.setId(1L);
@@ -55,7 +55,7 @@ class MapperTest {
   }
 
   @Test
-  void testUserToEntity() {
+  void toEntity_withUserDto_returnsUserEntity() {
     // Given
     UserDto dto = new UserDto();
     dto.setId(1L);
@@ -78,7 +78,7 @@ class MapperTest {
   }
 
   @Test
-  void testUserListToDto() {
+  void toDto_withUserList_returnsUserDtoList() {
     // Given
     User user1 = new User();
     user1.setId(1L);
@@ -109,7 +109,7 @@ class MapperTest {
   }
 
   @Test
-  void testTeacherToDto() {
+  void toDto_withTeacherEntity_returnsTeacherDto() {
     // Given
     Teacher teacher = new Teacher();
     teacher.setId(1L);
@@ -128,7 +128,7 @@ class MapperTest {
   }
 
   @Test
-  void testTeacherToEntity() {
+  void toEntity_withTeacherDto_returnsTeacherEntity() {
     // Given
     TeacherDto dto = new TeacherDto();
     dto.setId(1L);
@@ -146,7 +146,7 @@ class MapperTest {
   }
 
   @Test
-  void testTeacherListToDto() {
+  void toDto_withTeacherList_returnsTeacherDtoList() {
     // Given
     Teacher teacher1 = new Teacher();
     teacher1.setId(1L);
@@ -169,7 +169,7 @@ class MapperTest {
   }
 
   @Test
-  void testSessionToDto() {
+  void toDto_withSessionEntity_returnsSessionDto() {
     // Given
     Teacher teacher = new Teacher();
     teacher.setId(1L);
@@ -199,7 +199,7 @@ class MapperTest {
   }
 
   @Test
-  void testSessionListToDto() {
+  void toDto_withSessionList_returnsSessionDtoList() {
     // Given
     Session session1 = new Session();
     session1.setId(1L);
@@ -224,7 +224,7 @@ class MapperTest {
   }
 
   @Test
-  void testUserListToEntity() {
+  void toEntity_withUserDtoList_returnsUserEntityList() {
     // Given
     UserDto dto1 = new UserDto();
     dto1.setId(1L);
@@ -253,7 +253,4 @@ class MapperTest {
     assertEquals(dto1.getId(), users.get(0).getId());
     assertEquals(dto2.getId(), users.get(1).getId());
   }
-
-  // NOTE: Mapper branch coverage at 50% due to MapStruct-generated code which creates
-  // complex null-checking logic with numerous conditional branches
 }

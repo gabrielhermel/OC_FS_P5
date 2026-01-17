@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class ModelsTest {
 
   @Test
-  void testUserGettersAndSetters() {
+  void setAndGet_withUserProperties_returnsCorrectValues() {
     // Given
     User user = new User();
     LocalDateTime now = LocalDateTime.now();
@@ -38,7 +38,7 @@ class ModelsTest {
   }
 
   @Test
-  void testUserBuilder() {
+  void builder_withUserProperties_createsUserInstance() {
     // Given & When
     User user = User.builder()
         .id(1L)
@@ -58,7 +58,7 @@ class ModelsTest {
   }
 
   @Test
-  void testUserEqualsAndHashCode() {
+  void equalsAndHashCode_withSameId_returnsEqualUsers() {
     // Given
     User user1 = new User();
     user1.setId(1L);
@@ -78,7 +78,7 @@ class ModelsTest {
   }
 
   @Test
-  void testUserToString() {
+  void toString_withUserInstance_returnsStringRepresentation() {
     // Given
     User user = new User();
     user.setId(1L);
@@ -93,7 +93,7 @@ class ModelsTest {
   }
 
   @Test
-  void testTeacherGettersAndSetters() {
+  void setAndGet_withTeacherProperties_returnsCorrectValues() {
     // Given
     Teacher teacher = new Teacher();
     LocalDateTime now = LocalDateTime.now();
@@ -114,7 +114,7 @@ class ModelsTest {
   }
 
   @Test
-  void testTeacherBuilder() {
+  void builder_withTeacherProperties_createsTeacherInstance() {
     // Given & When
     Teacher teacher = Teacher.builder()
         .id(1L)
@@ -129,7 +129,7 @@ class ModelsTest {
   }
 
   @Test
-  void testTeacherEqualsAndHashCode() {
+  void equalsAndHashCode_withSameId_returnsEqualTeachers() {
     // Given
     Teacher teacher1 = new Teacher();
     teacher1.setId(1L);
@@ -147,7 +147,7 @@ class ModelsTest {
   }
 
   @Test
-  void testSessionGettersAndSetters() {
+  void setAndGet_withSessionProperties_returnsCorrectValues() {
     // Given
     Session session = new Session();
     Date date = new Date();
@@ -176,7 +176,7 @@ class ModelsTest {
   }
 
   @Test
-  void testSessionBuilder() {
+  void builder_withSessionProperties_createsSessionInstance() {
     // Given
     Date date = new Date();
     Teacher teacher = new Teacher();
@@ -198,7 +198,7 @@ class ModelsTest {
   }
 
   @Test
-  void testBuilderToString() {
+  void builderToString_withModelBuilders_returnsStringRepresentations() {
     // Given & When
     String userBuilder = User.builder().email("test@test.com").toString();
     String teacherBuilder = Teacher.builder().firstName("Jane").toString();
@@ -209,7 +209,4 @@ class ModelsTest {
     assertNotNull(teacherBuilder);
     assertNotNull(sessionBuilder);
   }
-
-  // NOTE: Models branch coverage at 41% due to Lombok annotations which generate
-  // complex methods with numerous conditional branches
 }

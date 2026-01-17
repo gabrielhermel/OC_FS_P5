@@ -41,7 +41,7 @@ class TeacherControllerTest {
 
   @Test
   @WithMockUser
-  void testFindTeacherById() throws Exception {
+  void findTeacherById_withExistingId_returnsTeacher() throws Exception {
     // When & Then
     mockMvc.perform(get("/api/teacher/" + testTeacher.getId()))
         .andExpect(status().isOk())
@@ -51,7 +51,7 @@ class TeacherControllerTest {
 
   @Test
   @WithMockUser
-  void testFindAllTeachers() throws Exception {
+  void findAllTeachers_whenCalled_returnsTeacherArray() throws Exception {
     // When & Then
     mockMvc.perform(get("/api/teacher"))
         .andExpect(status().isOk())
@@ -60,7 +60,7 @@ class TeacherControllerTest {
 
   @Test
   @WithMockUser
-  void testFindTeacherByIdNotFound() throws Exception {
+  void findTeacherById_withNonExistentId_returnsNotFound() throws Exception {
     // When & Then
     mockMvc.perform(get("/api/teacher/999999"))
         .andExpect(status().isNotFound());

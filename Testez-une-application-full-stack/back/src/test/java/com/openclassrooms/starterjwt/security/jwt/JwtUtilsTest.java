@@ -27,7 +27,7 @@ class JwtUtilsTest {
   }
 
   @Test
-  void testGenerateJwtToken() {
+  void generateJwtToken_withAuthentication_returnsValidToken() {
     // Given
     UserDetailsImpl userDetails = UserDetailsImpl.builder()
         .id(1L)
@@ -49,7 +49,7 @@ class JwtUtilsTest {
   }
 
   @Test
-  void testGetUserNameFromJwtToken() {
+  void getUserNameFromJwtToken_withValidToken_returnsUsername() {
     // Given
     String username = "test@test.com";
     String token = Jwts.builder()
@@ -67,7 +67,7 @@ class JwtUtilsTest {
   }
 
   @Test
-  void testValidateJwtTokenValid() {
+  void validateJwtToken_withValidToken_returnsTrue() {
     // Given
     String token = Jwts.builder()
         .setSubject("test@test.com")
@@ -84,7 +84,7 @@ class JwtUtilsTest {
   }
 
   @Test
-  void testValidateJwtTokenInvalid() {
+  void validateJwtToken_withInvalidToken_returnsFalse() {
     // Given
     String invalidToken = "invalid.token.here";
 
@@ -96,7 +96,7 @@ class JwtUtilsTest {
   }
 
   @Test
-  void testValidateJwtTokenExpired() {
+  void validateJwtToken_withExpiredToken_returnsFalse() {
     // Given
     String expiredToken = Jwts.builder()
         .setSubject("test@test.com")
@@ -113,7 +113,7 @@ class JwtUtilsTest {
   }
 
   @Test
-  void testValidateJwtTokenWithInvalidSignature() {
+  void validateJwtToken_withInvalidSignature_returnsFalse() {
     // Given (token signed with different secret)
     String tokenWithWrongSecret = Jwts.builder()
         .setSubject("test@test.com")

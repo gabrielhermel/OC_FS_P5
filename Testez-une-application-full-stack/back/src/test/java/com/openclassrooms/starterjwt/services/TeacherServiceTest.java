@@ -48,7 +48,7 @@ class TeacherServiceTest {
   }
 
   @Test
-  void testFindAll() {
+  void findAll_whenTeachersExist_returnsTeacherList() {
     // Given
     List<Teacher> teachers = Arrays.asList(testTeacher1, testTeacher2);
     when(teacherRepository.findAll()).thenReturn(teachers);
@@ -65,7 +65,7 @@ class TeacherServiceTest {
   }
 
   @Test
-  void testFindAllWhenEmpty() {
+  void findAll_whenNoTeachers_returnsEmptyList() {
     // Given
     when(teacherRepository.findAll()).thenReturn(Collections.emptyList());
 
@@ -79,7 +79,7 @@ class TeacherServiceTest {
   }
 
   @Test
-  void testFindByIdWhenTeacherExists() {
+  void findById_withExistingId_returnsTeacher() {
     // Given
     Long teacherId = 1L;
     when(teacherRepository.findById(teacherId)).thenReturn(Optional.of(testTeacher1));
@@ -96,7 +96,7 @@ class TeacherServiceTest {
   }
 
   @Test
-  void testFindByIdWhenTeacherDoesNotExist() {
+  void findById_withNonExistentId_returnsNull() {
     // Given
     Long teacherId = 999L;
     when(teacherRepository.findById(teacherId)).thenReturn(Optional.empty());

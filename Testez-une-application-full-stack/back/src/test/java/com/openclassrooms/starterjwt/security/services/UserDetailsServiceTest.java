@@ -25,7 +25,7 @@ class UserDetailsServiceTest {
   private UserDetailsServiceImpl userDetailsService;
 
   @Test
-  void testLoadUserByUsername() {
+  void loadUserByUsername_withExistingEmail_returnsUserDetails() {
     // Given
     User user = new User();
     user.setId(1L);
@@ -50,7 +50,7 @@ class UserDetailsServiceTest {
   }
 
   @Test
-  void testLoadUserByUsernameNotFound() {
+  void loadUserByUsername_withNonExistentEmail_throwsUsernameNotFoundException() {
     // Given
     when(userRepository.findByEmail("notfound@test.com")).thenReturn(Optional.empty());
 
@@ -63,7 +63,7 @@ class UserDetailsServiceTest {
   }
 
   @Test
-  void testUserDetailsImplMethods() {
+  void userDetailsImplMethods_whenCalled_returnExpectedDefaultValues() {
     // Given
     UserDetailsImpl userDetails = UserDetailsImpl.builder()
         .id(1L)
@@ -84,21 +84,25 @@ class UserDetailsServiceTest {
   }
 
   @Test
-  void testUserDetailsImplEquals() {
+  @SuppressWarnings("SimplifiableAssertion")
+  void equals_withUserDetailsImpl_comparesById() {
     // Given
     UserDetailsImpl user1 = UserDetailsImpl.builder().id(1L).build();
     UserDetailsImpl user2 = UserDetailsImpl.builder().id(1L).build();
     UserDetailsImpl user3 = UserDetailsImpl.builder().id(2L).build();
 
     // Then
+    assertEquals(user1, user1);
     assertEquals(user1, user2);
+    //noinspection ConstantValue
+    assertFalse(user1.equals(null));
     assertNotEquals(user3, user1);
     assertNotEquals(null, user1);
     assertNotEquals(new Object(), user1);
   }
 
   @Test
-  void testUserDetailsImplGetters() {
+  void getters_withUserDetailsImpl_returnCorrectValues() {
     // Given
     UserDetailsImpl userDetails = UserDetailsImpl.builder()
         .id(1L)
@@ -117,6 +121,4 @@ class UserDetailsServiceTest {
     assertEquals("password", userDetails.getPassword());
     assertTrue(userDetails.getAdmin());
   }
-
-  // Branch coverage limited to 50% by equals() method conditionals
 }

@@ -37,7 +37,7 @@ class UserServiceTest {
   }
 
   @Test
-  void testDeleteUser() {
+  void delete_withUserId_deletesUser() {
     // Given
     Long userId = 1L;
 
@@ -49,7 +49,7 @@ class UserServiceTest {
   }
 
   @Test
-  void testFindByIdWhenUserExists() {
+  void findById_withExistingId_returnsUser() {
     // Given
     Long userId = 1L;
     when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
@@ -67,7 +67,7 @@ class UserServiceTest {
   }
 
   @Test
-  void testFindByIdWhenUserDoesNotExist() {
+  void findById_withNonExistentId_returnsNull() {
     // Given
     Long userId = 999L;
     when(userRepository.findById(userId)).thenReturn(Optional.empty());

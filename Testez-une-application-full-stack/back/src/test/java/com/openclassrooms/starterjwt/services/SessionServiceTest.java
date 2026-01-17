@@ -46,7 +46,7 @@ class SessionServiceTest {
   }
 
   @Test
-  void testCreate() {
+  void create_withSession_savesAndReturnsSession() {
     // Given
     when(sessionRepository.save(any(Session.class))).thenReturn(testSession);
 
@@ -59,7 +59,7 @@ class SessionServiceTest {
   }
 
   @Test
-  void testParticipateSuccess() {
+  void participate_withValidUserAndSession_addsUserToSession() {
     // Given
     when(sessionRepository.findById(1L)).thenReturn(Optional.of(testSession));
     when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
@@ -72,7 +72,7 @@ class SessionServiceTest {
   }
 
   @Test
-  void testParticipateAlreadyParticipating() {
+  void participate_withExistingParticipant_throwsBadRequestException() {
     // Given
     testSession.getUsers().add(testUser);
     when(sessionRepository.findById(1L)).thenReturn(Optional.of(testSession));
@@ -83,7 +83,7 @@ class SessionServiceTest {
   }
 
   @Test
-  void testNoLongerParticipateSuccess() {
+  void noLongerParticipate_withExistingParticipant_removesUserFromSession() {
     // Given
     testSession.getUsers().add(testUser);
     when(sessionRepository.findById(1L)).thenReturn(Optional.of(testSession));
@@ -96,7 +96,7 @@ class SessionServiceTest {
   }
 
   @Test
-  void testParticipateWhenSessionNotFound() {
+  void participate_withNonExistentSession_throwsNotFoundException() {
     // Given
     when(sessionRepository.findById(1L)).thenReturn(Optional.empty());
 
@@ -105,7 +105,7 @@ class SessionServiceTest {
   }
 
   @Test
-  void testNoLongerParticipateWhenNotParticipating() {
+  void noLongerParticipate_withNonParticipant_throwsBadRequestException() {
     // Given
     when(sessionRepository.findById(1L)).thenReturn(Optional.of(testSession));
 
@@ -114,7 +114,7 @@ class SessionServiceTest {
   }
 
   @Test
-  void testNoLongerParticipateWhenSessionNotFound() {
+  void noLongerParticipate_withNonExistentSession_throwsNotFoundException() {
     // Given
     when(sessionRepository.findById(1L)).thenReturn(Optional.empty());
 

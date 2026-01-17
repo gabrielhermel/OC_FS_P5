@@ -27,7 +27,7 @@ class AuthControllerTest {
   private ObjectMapper objectMapper;
 
   @Test
-  void testRegisterUser() throws Exception {
+  void registerUser_withValidData_returnsSuccessMessage() throws Exception {
     // Given
     SignupRequest signupRequest = new SignupRequest();
     signupRequest.setEmail("newuser@test.com");
@@ -44,7 +44,7 @@ class AuthControllerTest {
   }
 
   @Test
-  void testRegisterUserWithExistingEmail() throws Exception {
+  void registerUser_withExistingEmail_returnsBadRequestError() throws Exception {
     // Given - First register a user
     SignupRequest signupRequest = new SignupRequest();
     signupRequest.setEmail("existing@test.com");
@@ -66,7 +66,7 @@ class AuthControllerTest {
   }
 
   @Test
-  void testLoginUser() throws Exception {
+  void authenticateUser_withValidCredentials_returnsTokenAndUsername() throws Exception {
     // Given - First register a user
     SignupRequest signupRequest = new SignupRequest();
     signupRequest.setEmail("login@test.com");

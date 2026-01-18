@@ -37,10 +37,25 @@ From the project root directory, import the SQL script to create tables and inse
 mysql -u root -p yoga < Testez-une-application-full-stack/ressources/sql/script.sql
 ```
 
-**Windows (CMD or PowerShell):**
+**Windows (CMD):**
 ```bash
 mysql -u root -p yoga < Testez-une-application-full-stack\ressources\sql\script.sql
 ```
+
+**Alternative (all platforms):**
+
+From the project root directory, connect to MySQL:
+```bash
+mysql -u root -p
+```
+
+Then run these commands in the MySQL prompt:
+```sql
+USE yoga;
+SOURCE Testez-une-application-full-stack/ressources/sql/script.sql;
+```
+
+*Note: The path is relative to where you ran the `mysql` command from.*
 
 This script will:
 - Create the necessary tables (TEACHERS, SESSIONS, USERS, PARTICIPATE)

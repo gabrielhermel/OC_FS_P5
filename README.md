@@ -22,7 +22,13 @@ Testing suite for a full-stack Angular/Spring Boot yoga session management appli
 
 ### 1. Create the Database
 
-Connect to MySQL and create the database:
+Connect to MySQL:
+
+```bash
+mysql -u root -p
+```
+
+Create the database by running this command in the MySQL prompt:
 
 ```sql
 CREATE DATABASE yoga;
